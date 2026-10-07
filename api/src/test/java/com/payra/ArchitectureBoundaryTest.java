@@ -17,21 +17,21 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 
 
 /**
- * Enforces the module bounderies from {@code docs/architecture.md}:
+ * Enforces the module boundaries from {@code docs/architecture.md}:
  * every module is a direct subpackage of {@code com.payra}, its public surface is
  * {@code .api}, its implementation is {@code .internal}, and other modules may only
  * use the public surface.
  * 
- * <p>The module list is derived from the compiled code itself, so an new module becomes
- * protected the moment its first claass appears - the rules cannot drift out of data.
+ * <p>The module list is derived from the compiled code itself, so a new module becomes
+ * protected the moment its first class appears - the rules cannot drift out of date.
  * That is also why this uses the ArchUnit core API from a plain JUnit test instead of
  * the {@code @ArchTest} fields: those only support a single static rule, not rules
  * generated per module at runtime.
  */
-class ArchitechtureBoundaryTest {
+class ArchitectureBoundaryTest {
     private static final String ROOT = "com.payra";
 
-    /** Imported once: every rull below evaluates against the same bytecode snapshot */
+    /** Imported once: every rule below evaluates against the same bytecode snapshot */
     private static final JavaClasses CLASSES = new ClassFileImporter().importPackages(ROOT);
 
     /** Every first-level package under {@code com.payra} that contains classes, e.g. "platform". */
