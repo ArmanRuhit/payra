@@ -365,6 +365,14 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Quiz: Q1 ✓ (explicit versions, not managed by Boot BOM); Q2 taught (Swagger UI = dev affordance — disable/gate before deploy); Q3 taught (test scope keeps the artifact to runtime needs — imports, conflicts, CVE scans, size).
 - Next: **P0.4d** — ArchUnit boundary test → P0.4 closes → P0.5 (frontend skeleton).
 
+### 2026-10-08 — Wrap-up: P0.4 CLOSED (module boundaries enforced)
+
+- `ArchitectureBoundaryTest` landed (`6c8dc66 test: enforce module boundaries with ArchUnit`, docs `688be78 docs: log P0.4c`). Suite **9/9 green** — boundary 3 (0.9 s) + handler 5 + contextLoads 1; tree clean.
+- P0.4 umbrella fully delivered: modular `com.payra` packages, RFC 7807 error contract, API docs (springdoc), Testcontainers base, ArchUnit boundary rules.
+- Placement lesson: file was first created under `src/main/java` → `com.tngtech` unresolved; ArchUnit is test-scope, so the compiler proved the classpath boundary — moved to `src/test/java`.
+- Resume checklist (5 min): (1) typo pass on the test file — class `ArchitechtureBoundaryTest` → `ArchitectureBoundaryTest`; Javadoc: `bounderies` → `boundaries`, `an new` → `a new`, `claass` → `class`, `out of data` → `out of date`, `rull` → `rule`; re-run `./mvnw test` → 9/9; commit `style(test): fix typos in boundary test`; (2) answer the P0.4d quiz — (a) why derive `MODULES` from compiled code, (b) what `allowEmptyShould(true)` trades away, (c) a concrete P2+ violation rule 1 catches.
+- Next slice — **P0.5 frontend skeleton**: Next.js 16 App Router + TS + Tailwind 4.3 + shadcn; checks `bunx tsc --noEmit`, lint, build. Then **P0.6** FE↔BE first contact (typed client + health widget).
+
 ## 12. Docs map
 
 | File | Purpose |
