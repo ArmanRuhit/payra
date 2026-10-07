@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-07 · Status: **Planning done, P0.1 next**
+Last updated: 2026-10-07 · Status: **P0.3 in progress (backend skeleton)**
 
 ## 1. Mission & success criteria
 
@@ -166,8 +166,8 @@ Pace target: ~2 slices/day; each phase ends **green and demo-able**. Interview-s
 
 ### Phase 0 — Foundation (infra + skeletons run locally)
 
-- [ ] P0.1 Repo init: folders, `git init`, README, .gitignore, .editorconfig
-- [ ] P0.2 `infra/docker-compose.yml`: Postgres 18, Redis 8, Kafka 4 KRaft, kafka-ui; verified up
+- [x] P0.1 Repo init: folders, `git init`, README, .gitignore, .editorconfig
+- [x] P0.2 `infra/docker-compose.yml`: Postgres 18, Redis 8, Kafka 4 KRaft, kafka-ui; verified up
 - [ ] P0.3 Backend skeleton (start.spring.io — deps listed); explain generated files; run + actuator health
 - [ ] P0.4 Backend baseline: `com.payra.<module>` packages, problem+json errors, springdoc, Testcontainers base test, ArchUnit ruleset
 - [ ] P0.5 Frontend skeleton (create-next-app: TS + Tailwind + App Router); theme tokens; layout shell
@@ -301,7 +301,21 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Name exploration: 15+ candidates collision-checked against real fintech products (KhataPay, PayLoom, Kosh, TakaFlow, Mohur, Kori, Keel, Trellis, Ingot, Daybook all busy; Coffer/Assay clean but unused). Owner decision: **keep "Payra"** — locked 2026-10-07.
 - Created: `CLAUDE.md`, `AGENTS.md`, `docs/architecture.md`, `docs/interview-map.md`, `docs/glossary.md`.
 - Workflow refinement (owner request): **i-have-adhd** output style always on (§7.1); slices delivered **one file per message**; typed files modified via **diffs only**.
-- Next: **P0.1** repo init (file 1 of 4 in flight: `.gitignore`).
+- Next: **P0.1** repo init.
+
+### 2026-10-07 — P0.1 complete
+
+- Repo scaffold committed: `80736db chore: repo scaffold (readme, gitignore, editorconfig)`.
+- Quiz: 3/3 reviewed — gap: formatter vs editorconfig (explained); sharpened: secret incident response (rotate → rewrite → ignore), `-b main` names the first branch.
+- README eyebrow softened: "modeled on existing payment platforms" (public-face hygiene).
+- Next: **P0.2** — infra (docker-compose: Postgres 18, Redis 8, Kafka 4 KRaft, kafka-ui).
+
+### 2026-10-07 — P0.2 complete
+
+- Infra up & verified: PostgreSQL 18.6, Redis `PONG`, Kafka 4.3.1 KRaft (`smoke-check` topic created), kafka-ui showing `payra-local` ONLINE (controller: KRAFT).
+- Review rounds caught 6 typos before first run (`=` vs `:`, `container-name`, `kakfa`, wrong Kafka props, kafka-ui var names); `docker compose config` now validates clean.
+- Quiz: Q1/Q2 (dual listeners, KRaft) explained; Q3 (dev-only credential vs secret store) covered inline.
+- Next: **P0.3** — Spring Boot skeleton via start.spring.io.
 
 ## 12. Docs map
 
