@@ -1,0 +1,85 @@
+# Payra local infrastructure - dev only
+# Real deployments inject secrets via env/secret store; nothing here is production-grade.
+# 
+# Start: docker compose up -d
+# Stop: docker compose down (keeps data)
+# Reset: docker compose down -v (wipes volumes - clean slate for demos)
+name: payra
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: payra-postgres
+    environment:
+      POSTGRES_DB: payra
+      POSTGRES_USER: payra
+      POSTGRES_PASSWORD: payra # dev only credential
+    ports:
+      - "5432:5432"
+    # PG 18 moved the data dir: mount /var/lib/postgresql (was ../data before 18)
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payra -d payra"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+  
+  redis:
+    image: redis:8
+    container_name: payra-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+  
+  kafka:
+    image: apache/kafka:4.3.1
+    container_name: payra-kafka
+    ports:
+      - "9092:9092" # host apps (Spring Boot) connect here
+    environment:
+      # Single node KRaft: this one process is both broker and controller
+      # No ZooKeeper - Kafka 4.x removed it.
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      # Two listener: EXTERNAL for host apps, INTERNAL for other containers.
+      # Advertised addresses are what clients are TOLD to reconnect to -
+      # that's why one broker can need two identities
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      # Single broker => replication factor 1 everywhere.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    restart: unless-stopped
+
+  kafka-ui:
+    image: kafbat/kafka-ui:v1.5.0
+    container_name: payra-kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: payra-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    depends_on:
+      - kafka
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
