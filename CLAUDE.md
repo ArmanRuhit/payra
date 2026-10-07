@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-07 · Status: **P0.4 in progress — restructure done, error contract next**
+Last updated: 2026-10-07 · Status: **⏸ Paused — resume at P0.4b finish (test file + run), then P0.4c pom / P0.4d arch test**
 
 ## 1. Mission & success criteria
 
@@ -97,7 +97,7 @@ Full flows, data model, ledger templates, Kafka design: `docs/architecture.md`.
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Backend | Java 21, Spring Boot **4.1.x**, Maven 3.9 | Boot 3.5 is EOL (Jun 2026) — docs-first for 4.x APIs |
+| Backend | Java 21, Spring Boot **4.1.x**, Maven 3.9, Lombok | Boot 3.5 is EOL (Jun 2026) — docs-first for 4.x APIs |
 | Data | PostgreSQL 18, Flyway | no `ddl-auto`; migrations only |
 | Cache/ratelimit | Redis 8 | OTP throttle, rate limits |
 | Messaging | Kafka 4.x (KRaft, Docker), spring-kafka | 1 broker locally; 3-broker answer for prod |
@@ -274,6 +274,7 @@ Exit: interview-ready.
 - **Time:** store UTC (`Instant`); render `Asia/Dhaka` in UI.
 - **Security:** no secrets in git; PIN/OTP never logged; tokens short-lived; roles `CUSTOMER`, `OPS_ADMIN`.
 - **Tests:** every slice ships tests; wallet-mutating code needs a concurrency test; ledger needs invariant tests; `mvn verify` + `bun run build` green before commit.
+- **Lombok (adopted P0.4b, owner request):** targeted `@Getter`/`@Setter`/`@Builder` only; prefer records for DTOs (no annotation needed); never `@Data`/`@EqualsAndHashCode`/`@ToString` on JPA entities — lazy proxies and mutable identity make generated equality a bug factory.
 - **Commits:** conventional (`feat(ledger): ...`), one slice per commit.
 - **Docs-first:** Boot 4.x and Next 16 differ from older tutorials — verify against official docs (`docs.spring.io/spring-boot/4.1/`, `node_modules/next/dist/docs/`, `kafka.apache.org/documentation/`) before writing code in a new area.
 
@@ -331,7 +332,20 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - App moved to `com.payra.PayraApplication`; test trio moved (`PayraApplicationTests`, `TestPayraApplication`, `TestcontainersConfiguration` with pinned tags `apache/kafka-native:4.3.1`, `postgres:18`, `redis:8`); old `com.payra.api` deleted.
 - `./mvnw test` green — full context boots against Testcontainers (TC 2.0.5; Postgres 18.6, Redis 8, Kafka 4.3.1-native) in 59 s first run (image pulls).
 - Benign warnings noted: Flyway "no migrations found" (expected until P1.1); Mockito self-attach deprecation (revisit P8).
+- Convention change (owner request): **Lombok adopted** — accessors via `@Getter`/`@Setter`; owner-added pom fixed (invalid `annotationProcessor` scope → optional + fat-jar exclude).
 - Next: P0.4b — error contract (`ErrorCode` catalogue + `PayraException` + RFC 7807 handler).
+
+### 2026-10-07 — Wrap-up (end of day)
+
+- **Done:** error contract typed — `ErrorCode` (catalogue), `PayraException` (base exception), `GlobalExceptionHandler` (RFC 7807), plus `spring.mvc.problemdetails.enabled=true`; Lombok adopted (§5 + §9 updated); suite green (`./mvnw test` → context test passed, 6.2 s with cached containers).
+- **Pending in P0.4b:** `GlobalExceptionHandlerTest` (file 5 of 5 — code in chat history) + test run + quiz.
+- **Resume checklist (next session):**
+  1. Type `GlobalExceptionHandlerTest` (ask for a re-post if needed)
+  2. `cd api && ./mvnw test` → expect **5 green**
+  3. Commit: `test(platform): cover error contract`
+  4. **P0.4c:** one `pom.xml` diff — springdoc-openapi `3.1.1`, ArchUnit `1.5.1`, metadata touch-up
+  5. **P0.4d:** architecture-boundary test → P0.4 closes → P0.5 (frontend skeleton)
+- Reviews caught today: 9 compose-file typos; wrong JPA starter (`data-jdbc` vs `data-jpa`); wrong `MethodArgumentNotValidException` import (messaging vs `web.bind` — silent 500s on validation errors); missing URI slash; `annotationProcessor` (not a Maven scope).
 
 ## 12. Docs map
 
