@@ -347,6 +347,15 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
   5. **P0.4d:** architecture-boundary test → P0.4 closes → P0.5 (frontend skeleton)
 - Reviews caught today: 9 compose-file typos; wrong JPA starter (`data-jdbc` vs `data-jpa`); wrong `MethodArgumentNotValidException` import (messaging vs `web.bind` — silent 500s on validation errors); missing URI slash; `annotationProcessor` (not a Maven scope).
 
+### 2026-10-08 — P0.4b complete: error contract tested
+
+- `GlobalExceptionHandlerTest` committed (`a6e2e83 test(platform): cover error contract`) — standalone MockMvc; 5 tests in 0.18 s; suite **6/6 green**.
+- Contract locked by tests: exact `type` URL, always-present `code`, `detail` omitted when equal to `title`, and 500s leaking nothing (fake `password=hunter2` probe stays server-side).
+- Review: 2 Javadoc typos caught + one expected-noise question resolved (test 5's ERROR trace is by design — handler logs, response stays clean).
+- Quiz: Q1 sharpened (standalone vs full-context MockMvc); Q2/Q3 taught — detail-omission tradeoff, why 500 bodies never echo `getMessage()` (re-derive before interview).
+- Env note: `git status` may print `ok` on a clean tree (owner's `rtk` output filter) — benign, not a stray file.
+- Next: **P0.4c** pom diff (springdoc `3.1.1`, ArchUnit `1.5.1`, metadata) → **P0.4d** boundary test.
+
 ## 12. Docs map
 
 | File | Purpose |

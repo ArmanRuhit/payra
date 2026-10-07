@@ -154,11 +154,13 @@ Producer config: `acks=all`, idempotent producer, JSON serializer; local 1 broke
 ## 11. Error model (RFC 7807)
 
 ```json
-{ "type": "https://payra.dev/errors/insufficient-funds",
+{ "type": "https://payra.apps.armanruhit.dev/errors/insufficient-funds",
   "title": "Insufficient funds", "status": 422, "code": "WALLET_INSUFFICIENT_FUNDS",
   "detail": "Available balance ৳450.00, required ৳500.00 + ৳5.00 fee",
   "traceId": "…" }
 ```
+
+Wired in P0.4b: `type` = `https://payra.apps.armanruhit.dev/errors/<code-lower-kebab>`; `code` always present; `detail` omitted when it equals `title`. `traceId` ships with the P6 observability pass.
 
 Code catalogue (grows per phase): `AUTH_OTP_*`, `AUTH_PIN_LOCKED`, `KYC_TIER_REQUIRED`, `WALLET_INSUFFICIENT_FUNDS`, `WALLET_FROZEN`, `LIMIT_EXCEEDED_DAILY|MONTHLY|PER_TX`, `IDEMPOTENCY_IN_PROGRESS|MISMATCH`, `TRANSFER_INVALID_STATE`, `PROVIDER_UNAVAILABLE`.
 
