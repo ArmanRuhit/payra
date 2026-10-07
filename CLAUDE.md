@@ -356,6 +356,15 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Env note: `git status` may print `ok` on a clean tree (owner's `rtk` output filter) — benign, not a stray file.
 - Next: **P0.4c** pom diff (springdoc `3.1.1`, ArchUnit `1.5.1`, metadata) → **P0.4d** boundary test.
 
+### 2026-10-08 — P0.4c complete: API docs + ArchUnit on board
+
+- Commits: `7c7d871 docs: close P0.4b (progress log, error URL)` then `e3a64ae chore(api): add springdoc + ArchUnit` — tree clean.
+- `pom.xml`: springdoc-openapi `3.1.1` (runtime) + archunit-junit5 `1.5.1` (test), versions pinned via properties — neither is in the Boot BOM, so Boot does not manage them.
+- Verified on 8080: `/v3/api-docs` → OpenAPI 3.1 JSON (`paths` empty until P1); `/actuator/health` → `UP` (db, redis 8.10.2, disk, ssl); swagger-ui → 200. Suite 6/6.
+- Port incident: Trakwise frontend moved `8080:80` → `8082:80` in `/desk/jobs/projects/Trakwise/docker-compose.yml` (`36c6eda`); stack recreated from its real path (Docker labels had the pre-move `/desk/Codes/Trakwise`); named volume preserved. Trakwise UI now `localhost:8082` — Payra keeps 8080.
+- Quiz: Q1 ✓ (explicit versions, not managed by Boot BOM); Q2 taught (Swagger UI = dev affordance — disable/gate before deploy); Q3 taught (test scope keeps the artifact to runtime needs — imports, conflicts, CVE scans, size).
+- Next: **P0.4d** — ArchUnit boundary test → P0.4 closes → P0.5 (frontend skeleton).
+
 ## 12. Docs map
 
 | File | Purpose |
