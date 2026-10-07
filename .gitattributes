@@ -1,0 +1,12 @@
+# Keep line endings consistent across machines: LF in the repository.
+# Windows-only scripts keep CRLF on checkout.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+
+# Binary assets should stay untouched
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary

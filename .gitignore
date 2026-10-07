@@ -1,0 +1,44 @@
+# =====================================================================
+# Payra .gitignore — what this repo refuses to track.
+# Rule of thumb: generated files, secrets, and machine-local junk never
+# belong in git. If a file can be reproduced by a command, ignore it.
+# =====================================================================
+
+# --- Java / Maven -----------------------------------------------------
+target/
+*.class
+!.mvn/wrapper/maven-wrapper.jar
+
+# --- Node / Next.js ---------------------------------------------------
+# (web/ gets its own generated .gitignore in P0.5 — this block is the safety net)
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Secrets & environment --------------------------------------------
+# Real credentials and signing keys never get committed. .env.example IS committed.
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.jks
+
+# --- IDE / editors ------------------------------------------------------
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# --- OS ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# --- Logs & local data -------------------------------------------------
+*.log
+logs/
+infra/data/

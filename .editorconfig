@@ -1,0 +1,23 @@
+# https://editorconfig.org
+# One style contract for a two-stack repo (Java + TypeScript).
+# Editors that support EditorConfig apply these rules automatically, so
+# git diffs stay clean no matter which editor wrote the code.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{java,sql,xml}]
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,properties}]
+indent_style = space
+indent_size = 2
+
+[*.{ts,tsx,js,jsx,json,css,md}]
+indent_style = space
+indent_size = 2
