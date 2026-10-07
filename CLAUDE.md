@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-07 · Status: **P0.3 in progress (backend skeleton)**
+Last updated: 2026-10-07 · Status: **P0.4 in progress — restructure done, error contract next**
 
 ## 1. Mission & success criteria
 
@@ -316,6 +316,22 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Review rounds caught 6 typos before first run (`=` vs `:`, `container-name`, `kakfa`, wrong Kafka props, kafka-ui var names); `docker compose config` now validates clean.
 - Quiz: Q1/Q2 (dual listeners, KRaft) explained; Q3 (dev-only credential vs secret store) covered inline.
 - Next: **P0.3** — Spring Boot skeleton via start.spring.io.
+
+### 2026-10-07 — P0.3 complete
+
+- Skeleton generated via start.spring.io (Boot 4.1.1); initial package `com.payra.api` — superseded by P0.4a below.
+- Review fixed one real bug: `data-jdbc` → `data-jpa` (artifact `spring-boot-starter-data-jpa-test:4.1.1` verified on Maven Central). Boot 4 naming learned: `webmvc`/`flyway`/`kafka` starters, per-starter `-test` modules, Testcontainers 2.x ids.
+- `application.properties`: datasource, `ddl-auto=validate`, `open-in-view=false`, kafka, actuator — with explanatory comments.
+- `curl /actuator/health` → `status: UP` (`db` + `redis 8.10.2`).
+- Quiz 2.5/3 — Maven-vs-JDK axis corrected; "pool exhaustion" wording fixed.
+- Next: **P0.4** — backend baseline (restructure → error contract → springdoc → ArchUnit).
+
+### 2026-10-07 — P0.4a complete: restructure to `com.payra`
+
+- App moved to `com.payra.PayraApplication`; test trio moved (`PayraApplicationTests`, `TestPayraApplication`, `TestcontainersConfiguration` with pinned tags `apache/kafka-native:4.3.1`, `postgres:18`, `redis:8`); old `com.payra.api` deleted.
+- `./mvnw test` green — full context boots against Testcontainers (TC 2.0.5; Postgres 18.6, Redis 8, Kafka 4.3.1-native) in 59 s first run (image pulls).
+- Benign warnings noted: Flyway "no migrations found" (expected until P1.1); Mockito self-attach deprecation (revisit P8).
+- Next: P0.4b — error contract (`ErrorCode` catalogue + `PayraException` + RFC 7807 handler).
 
 ## 12. Docs map
 
