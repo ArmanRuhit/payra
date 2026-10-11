@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-11 · Status: **Resumed at P0.5 (frontend skeleton) — interview lands after full build; pacing at max**
+Last updated: 2026-10-11 · Status: **⏸ Wrapped (eve) — P1.1 part 1 pushed (V1, UserStatus, User); resume: UserRepository → repo test → P1.2**
 
 ## 1. Mission & success criteria
 
@@ -170,8 +170,8 @@ Pace target: ~2 slices/day; each phase ends **green and demo-able**. Interview-s
 - [x] P0.2 `infra/docker-compose.yml`: Postgres 18, Redis 8, Kafka 4 KRaft, kafka-ui; verified up
 - [ ] P0.3 Backend skeleton (start.spring.io — deps listed); explain generated files; run + actuator health
 - [ ] P0.4 Backend baseline: `com.payra.<module>` packages, problem+json errors, springdoc, Testcontainers base test, ArchUnit ruleset
-- [ ] P0.5 Frontend skeleton (create-next-app: TS + Tailwind + App Router); theme tokens; layout shell
-- [ ] P0.6 FE↔BE first contact: typed API client, env config, home page shows API health
+- [x] P0.5 Frontend skeleton (create-next-app: TS + Tailwind + App Router); theme tokens; layout shell
+- [x] P0.6 FE↔BE first contact: typed API client, env config, home page shows API health
 
 Exit: `docker compose up -d`, `mvn spring-boot:run`, `bun run dev` all green and documented.
 
@@ -276,7 +276,7 @@ Exit: interview-ready.
 - **Tests:** every slice ships tests; wallet-mutating code needs a concurrency test; ledger needs invariant tests; `mvn verify` + `bun run build` green before commit.
 - **Lombok (adopted P0.4b, owner request):** targeted `@Getter`/`@Setter`/`@Builder` only; prefer records for DTOs (no annotation needed); never `@Data`/`@EqualsAndHashCode`/`@ToString` on JPA entities — lazy proxies and mutable identity make generated equality a bug factory.
 - **Commits:** conventional (`feat(ledger): ...`), one slice per commit.
-- **Docs-first:** Boot 4.x and Next 16 differ from older tutorials — verify against official docs (`docs.spring.io/spring-boot/4.1/`, `node_modules/next/dist/docs/`, `kafka.apache.org/documentation/`) before writing code in a new area.
+- **Docs-first:** Boot 4.x and Next 16 differ from older tutorials — verify against official docs (`docs.spring.io/spring-boot/4.1/`, `node_modules/next/dist/docs/`, `kafka.apache.org/documentation/`) before writing code in a new area. **Next 16 specifics:** the scaffold enables `cacheComponents: true` — uncached I/O (`fetch(..., {cache:"no-store"})`, `cookies()`, `headers()`) must sit behind `<Suspense>` or the route fails prerender validation ("Blocking Route"); `export const instant = false` is the documented escape hatch (use sparingly). Always check `web/node_modules/next/dist/docs/` first.
 
 ## 10. Commands (updated as slices land)
 
@@ -379,6 +379,22 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - P0.4 confirmed closed from the Oct 8 session (suite 9/9; springdoc; ArchUnit boundaries; Trakwise vacated 8080 → Payra keeps it).
 - Drive-by fixes queued: `application.properties` comment typos (`PFC 7807`, `# --- Actuator --`); P0.4d quiz still open (optional).
 - Next: **P0.5** — generate `web/` (create-next-app, Bun, App Router, Tailwind, `--empty`), then verify dev / typecheck / lint / build.
+
+### 2026-10-11 — P0.5 + P0.6 complete — **Phase 0 closed**
+
+- `web/` bootstrapped (Next 16.4, React 19.3, Tailwind 4.3; Bun; `--empty`; `--disable-git`) + shadcn init (`base-nova`, lucide icons) + Payra theme tokens (emerald-ink primary, `--success`/`--warning` semantics) + typed API client (`apiFetch`/`ApiError`/`getHealth`) + streamed health widget on `/`.
+- Lesson (docs-first payoff): Next 16 scaffold ships `cacheComponents: true` — uncached fetch outside `<Suspense>` = "Blocking Route" prerender error. Fix pattern: sync page shell + async `<HealthCard>` inside `<Suspense>` + skeleton fallback. §9 updated with the specifics.
+- Partial-refactor bug caught in review: leftover `await loadHealth()` in `Home` kept the route blocking and double-fetched; fixed with the two-line diff.
+- Commits `1438ba4`, `cea726e`; tree clean; tsc / lint / build green.
+- Next: **P1.1** — `V1__create_users.sql` → `UserStatus` → `User` (internal) → `UserRepository` → repository test (Testcontainers).
+
+### 2026-10-11 — Wrap-up #2: P1.1 part 1 (identity root)
+
+- Committed: `V1__create_users.sql` (users, status CHECK, unique phone), `UserStatus` enum, `User` entity (factory + named transitions, `@Version`, timestamps).
+- Pre-commit review caught two one-word landmines: `DEFAULE`→`DEFAULT` (SQL syntax error) and `SUSPEND`→`SUSPENDED` (mismatch vs CHECK constraint) — fixed before the first push of the slice.
+- Verification: suite **9/9 green** — Flyway applied V1 to Testcontainers Postgres ("now at version v1"); full-context boot passed Hibernate `validate` (entity↔schema contract holds); ArchUnit 3/3 automatically protects the new `identity.internal` package.
+- Pushed to `origin/main` (github.com/ArmanRuhit/payra).
+- Resume checklist: (1) type `UserRepository.java` (file 4 of 5) + `UserRepositoryTest.java` (file 5 of 5); (2) `./mvnw test`; (3) commit `feat(identity): user repository + tests`; (4) then **P1.2** — OTP-lite (request/verify, hashed OTP, Redis throttle).
 
 ## 12. Docs map
 
