@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-07 · Status: **⏸ Paused — resume at P0.4b finish (test file + run), then P0.4c pom / P0.4d arch test**
+Last updated: 2026-10-11 · Status: **Resumed at P0.5 (frontend skeleton) — interview lands after full build; pacing at max**
 
 ## 1. Mission & success criteria
 
@@ -372,6 +372,13 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Placement lesson: file was first created under `src/main/java` → `com.tngtech` unresolved; ArchUnit is test-scope, so the compiler proved the classpath boundary — moved to `src/test/java`.
 - Resume checklist (5 min): (1) typo pass on the test file — class `ArchitechtureBoundaryTest` → `ArchitectureBoundaryTest`; Javadoc: `bounderies` → `boundaries`, `an new` → `a new`, `claass` → `class`, `out of data` → `out of date`, `rull` → `rule`; re-run `./mvnw test` → 9/9; commit `style(test): fix typos in boundary test`; (2) answer the P0.4d quiz — (a) why derive `MODULES` from compiled code, (b) what `allowEmptyShould(true)` trades away, (c) a concrete P2+ violation rule 1 catches.
 - Next slice — **P0.5 frontend skeleton**: Next.js 16 App Router + TS + Tailwind 4.3 + shadcn; checks `bunx tsc --noEmit`, lint, build. Then **P0.6** FE↔BE first contact (typed client + health widget).
+
+### 2026-10-11 — Resumed
+
+- Owner re-prioritization: interview lands **after full project completion**; time-crunched → phases run in order at max pace, interview drill (P8.7) stays last; ⭐ stretch items are the first cut if needed.
+- P0.4 confirmed closed from the Oct 8 session (suite 9/9; springdoc; ArchUnit boundaries; Trakwise vacated 8080 → Payra keeps it).
+- Drive-by fixes queued: `application.properties` comment typos (`PFC 7807`, `# --- Actuator --`); P0.4d quiz still open (optional).
+- Next: **P0.5** — generate `web/` (create-next-app, Bun, App Router, Tailwind, `--empty`), then verify dev / typecheck / lint / build.
 
 ## 12. Docs map
 
