@@ -31,9 +31,16 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
 class ArchitectureBoundaryTest {
     private static final String ROOT = "com.payra";
 
-    /** Imported once: every rule below evaluates against the same bytecode snapshot */
-    private static final JavaClasses CLASSES = new ClassFileImporter().importPackages(ROOT);
-
+    /**
+     * Imported once: every rule below evaluates against the same bytecode snapshot.
+     *
+     * <p>Boot 4 compiles synthetic {@code *__BeanFactoryRegistrations} /
+     * {@code *__BeanDefinitions} classes (framework plumbing) — excluded so the
+     * rules judge only the code humans write.
+     */
+    private static final JavaClasses CLASSES = new ClassFileImporter()
+            .withImportOption(location -> !location.contains("__"))
+            .importPackages(ROOT);
     /** Every first-level package under {@code com.payra} that contains classes, e.g. "platform". */
     private static final Set<String> MODULES = CLASSES.stream()
             .map(JavaClass::getPackageName)
