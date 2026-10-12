@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-11 · Status: **⏸ Wrapped (eve) — P1.1 part 1 pushed (V1, UserStatus, User); resume: UserRepository → repo test → P1.2**
+Last updated: 2026-10-12 · Status: **Sprint Oct 12–15 — P1.1 ✅ (13/13); P1.2 OTP in progress; understanding-first**
 
 ## 1. Mission & success criteria
 
@@ -396,6 +396,19 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Pushed to `origin/main` (github.com/ArmanRuhit/payra).
 - Resume checklist: (1) type `UserRepository.java` (file 4 of 5) + `UserRepositoryTest.java` (file 5 of 5); (2) `./mvnw test`; (3) commit `feat(identity): user repository + tests`; (4) then **P1.2** — OTP-lite (request/verify, hashed OTP, Redis throttle).
 
+### 2026-10-12 — Sprint plan (Oct 12–15)
+
+- Owner question "finish by Oct 15?": **full plan — no** (55/59 items remain; it is a 3–4 week build). Scoped **interview core — yes if tight**: identity → ledger → top-up → P2P → minimal UI. Cut list + per-day checklists in `docs/sprint-oct-12-15.md`.
+- Sprint rules: understanding-first (quizzes stay, light); one-file-per-message unchanged; commit per slice; push daily; dates are a priority map, not a whip; overruns cut from the bottom of the next day's list.
+- Next: P1.1 tail — `UserRepository` + Testcontainers repo test.
+
+### 2026-10-12 — P1.1 complete
+
+- `UserRepository` + `UserRepositoryTest` (4 slice tests against real Postgres: save/find, activate + `@Version` bump, duplicate-phone rejected) — suite **13/13**.
+- Boot 4 lessons banked: `@DataJpaTest` now lives at `org.springframework.boot.data.jpa.test.autoconfigure` (per-module test artifacts); `TestcontainersConfiguration` made `public` for cross-package reuse.
+- ArchUnit earned its keep: flagged Boot-generated `*__BeanFactoryRegistrations` touching `identity.internal`; import now excludes `__`-marked generated classes so rules judge human code only.
+- Next: **P1.2** — OTP: `V2__create_otp_challenges.sql` → `OtpChallenge` + repository → request/verify service (bcrypt hashes, 5-min TTL, 5-attempt cap) → tests.
+
 ## 12. Docs map
 
 | File | Purpose |
@@ -403,6 +416,7 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 | `docs/architecture.md` | flows, module map, ledger templates, data model, mechanisms |
 | `docs/interview-map.md` | JD→artifact matrix, Q&A bank, demo script, metrics |
 | `docs/glossary.md` | vocabulary used in this project |
+| `docs/sprint-oct-12-15.md` | Sprint Oct 12–15: interview-core cut scope + per-day checklists |
 | `docs/adr/` | decision records (from P2.7 onward) |
 
 ## 13. Interview map (summary)
