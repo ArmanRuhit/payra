@@ -3,7 +3,7 @@
 > **Read me first.** Single source of truth for `projects/payra/`: mission, JD analysis, architecture, conventions, pairing workflow, roadmap, and the live progress log. `AGENTS.md` defers here.
 > Vault-level rules live in `/desk/e/ruhit/CLAUDE.md`. **Exception:** the vault default "CodeCrafters mode" (hints before code) is *superseded* here by the **pair-typing mode** in §7 — the owner wants full code per slice to type by hand.
 
-Last updated: 2026-10-12 · Status: **Sprint Oct 12–15 — P1.1 ✅ (13/13); P1.2 OTP in progress; understanding-first**
+Last updated: 2026-10-12 · Status: **⏸ Wrapped — P1.2 ✅ (18/18); resume: P1.3 (pom: Spring Security + Nimbus JWT); understanding-first**
 
 ## 1. Mission & success criteria
 
@@ -408,6 +408,13 @@ docker run --rm -i --network host grafana/k6 run - < infra/k6/send-money.js
 - Boot 4 lessons banked: `@DataJpaTest` now lives at `org.springframework.boot.data.jpa.test.autoconfigure` (per-module test artifacts); `TestcontainersConfiguration` made `public` for cross-package reuse.
 - ArchUnit earned its keep: flagged Boot-generated `*__BeanFactoryRegistrations` touching `identity.internal`; import now excludes `__`-marked generated classes so rules judge human code only.
 - Next: **P1.2** — OTP: `V2__create_otp_challenges.sql` → `OtpChallenge` + repository → request/verify service (bcrypt hashes, 5-min TTL, 5-attempt cap) → tests.
+
+### 2026-10-12 — P1.2 complete (OTP)
+
+- Shipped: `V2__create_otp_challenges.sql`, `OtpStatus`/`OtpChallenge`/`OtpChallengeRepository` (+ row-locked finder), `OtpService` (bcrypt-hashed codes, 5-min TTL, 5-attempt cap), `PasswordEncoderConfig`, `ClockConfig`; `ErrorCode` gained `AUTH_OTP_INVALID | EXPIRED | TOO_MANY_ATTEMPTS`.
+- Suite **18/18** — the rollback-trap test pins `REQUIRES_NEW` + `noRollbackFor` (attempt counters survive thrown errors).
+- Three failures survived en route (all now interview material): entity typo `code_hase` caught by `validate` at boot; locked finder without an active transaction (Hibernate enforcing lock-without-tx); JUnit test-constructor autowiring (`@Autowired` required on test constructors). Interview-map gained **Q31–32** (dirty checking, `REQUIRES_NEW`).
+- Next: **P1.3** — Spring Security + Nimbus JWT: `/api/v1/auth/otp/request`, `/api/v1/auth/otp/verify` (find-or-create → token), `/api/v1/me`; test imports use `org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc` (Boot 4 package — verified in cache).
 
 ## 12. Docs map
 

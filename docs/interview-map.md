@@ -76,6 +76,11 @@ How to steer a Pathao (fintech backend) interview onto this project. Owned by th
 29. Which metrics for payments? — success rate by type, p95 latency, stuck transfers, DLQ size, consumer lag, suspense balance. *(P8.3)*
 30. Testing strategy? — unit domain, Testcontainers integration, concurrency suites, ArchUnit boundaries, Playwright smoke, k6 load. *(all phases)*
 
+**JPA & transactions**
+
+31. You changed a field but never called `save()` — why did the DB update? — dirty checking: the persistence context is a unit of work; managed entities are compared against their load-time snapshot at flush (usually commit) and changed ones emit UPDATEs. Traps: detached changes silently vanish; auto-flush before queries; Hibernate updates all mapped columns by default; this is also why `open-in-view=false`. *(OtpService P1.2)*
+32. How do you persist an audit/failure record when the surrounding operation fails? — independent commit: `REQUIRES_NEW` (suspends caller TX, commits on its own) + `noRollbackFor=PayraException` (default rules would roll back on our own throw). Requires: one TX has one fate — inner rules can't save a doomed outer TX; `NESTED` is savepoints, not independent commit; costs: second connection + deadlock risk against locks held by the suspended TX; alternatives: after-commit hooks, outbox. *(OtpService.verify P1.2)*
+
 ## 4. Demo script (5 minutes; rehearse in P8.7)
 
 1. Landing → login with phone; OTP from API log; set PIN
